@@ -8,8 +8,6 @@
 #
 # Usage:
 #   ./install.sh              # Interactive installation
-#   ./install.sh minimal      # Quick minimal setup
-#   ./install.sh developer    # Full developer setup
 #   ./install.sh --help       # Show help
 #
 # Repository: https://github.com/yourusername/terminal-customization
@@ -43,7 +41,6 @@ MODULES_FONTS="${PROJECT_ROOT}/modules/fonts"
 MODULES_PROMPT="${PROJECT_ROOT}/modules/prompt"
 MODULES_PLUGINS="${PROJECT_ROOT}/modules/plugins"
 MODULES_UTILS="${PROJECT_ROOT}/modules/utils"
-PROFILES_DIR="${PROJECT_ROOT}/profiles"
 
 # Installation tracking
 declare -a INSTALLED_MODULES=()
@@ -143,201 +140,41 @@ preflight_checks() {
 }
 
 # =============================================================================
-# Profile Definitions
+# Installation Plan Display
 # =============================================================================
-show_profile_details() {
-    local profile="$1"
-
-    case "$profile" in
-        1|minimal)
-            echo -e "\n${BOLD}Minimal Profile${NC}"
-            echo -e "${DIM}Basic terminal enhancement with essential tools${NC}\n"
-            echo -e "  ${CYAN}${ICON_BULLET}${NC} Homebrew (package manager)"
-            echo -e "  ${CYAN}${ICON_BULLET}${NC} Oh My ZSH (shell framework)"
-            echo -e "  ${CYAN}${ICON_BULLET}${NC} MesloLGS Nerd Font"
-            echo -e "  ${CYAN}${ICON_BULLET}${NC} Powerlevel10k (beautiful prompt)"
-            echo ""
-            ;;
-        2|developer)
-            echo -e "\n${BOLD}Developer Profile${NC}"
-            echo -e "${DIM}Complete setup with all productivity tools${NC}\n"
-            echo -e "  ${BOLD}Base:${NC}"
-            echo -e "  ${CYAN}${ICON_BULLET}${NC} Everything in Minimal profile"
-            echo ""
-            echo -e "  ${BOLD}ZSH Plugins:${NC}"
-            echo -e "  ${CYAN}${ICON_BULLET}${NC} zsh-autosuggestions (fish-like suggestions)"
-            echo -e "  ${CYAN}${ICON_BULLET}${NC} zsh-syntax-highlighting"
-            echo -e "  ${CYAN}${ICON_BULLET}${NC} zsh-completions"
-            echo -e "  ${CYAN}${ICON_BULLET}${NC} zsh-history-substring-search"
-            echo ""
-            echo -e "  ${BOLD}CLI Utilities:${NC}"
-            echo -e "  ${CYAN}${ICON_BULLET}${NC} fzf (fuzzy finder)"
-            echo -e "  ${CYAN}${ICON_BULLET}${NC} bat (better cat)"
-            echo -e "  ${CYAN}${ICON_BULLET}${NC} eza (modern ls)"
-            echo -e "  ${CYAN}${ICON_BULLET}${NC} ripgrep (fast grep)"
-            echo -e "  ${CYAN}${ICON_BULLET}${NC} fd (find alternative)"
-            echo -e "  ${CYAN}${ICON_BULLET}${NC} zoxide (smart cd)"
-            echo -e "  ${CYAN}${ICON_BULLET}${NC} delta (git diff viewer)"
-            echo -e "  ${CYAN}${ICON_BULLET}${NC} lazygit (git TUI)"
-            echo ""
-            ;;
-        3|custom)
-            echo -e "\n${BOLD}Custom Profile${NC}"
-            echo -e "${DIM}Choose exactly what you want to install${NC}\n"
-            echo -e "  ${CYAN}${ICON_BULLET}${NC} Interactive module selection"
-            echo -e "  ${CYAN}${ICON_BULLET}${NC} Pick and choose each component"
-            echo -e "  ${CYAN}${ICON_BULLET}${NC} Skip components you don't need"
-            echo ""
-            ;;
-    esac
-}
-
-# =============================================================================
-# Profile Selection Menu
-# =============================================================================
-select_profile() {
-    print_divider "Select Installation Profile"
+show_installation_plan() {
+    print_divider "What Will Be Installed"
 
     echo ""
-    echo -e "  ${CYAN}1)${NC} ${BOLD}Minimal${NC}"
-    echo -e "     ${DIM}Homebrew + Oh My ZSH + Powerlevel10k + Nerd Fonts${NC}"
+    echo -e "  ${BOLD}Base Components:${NC}"
+    echo -e "  ${CYAN}${ICON_BULLET}${NC} Xcode Command Line Tools"
+    echo -e "  ${CYAN}${ICON_BULLET}${NC} Homebrew (package manager)"
     echo ""
-    echo -e "  ${CYAN}2)${NC} ${BOLD}Developer${NC}"
-    echo -e "     ${DIM}Minimal + all ZSH plugins + essential utilities${NC}"
+    echo -e "  ${BOLD}Shell Framework:${NC}"
+    echo -e "  ${CYAN}${ICON_BULLET}${NC} Oh My ZSH"
     echo ""
-    echo -e "  ${CYAN}3)${NC} ${BOLD}Custom${NC}"
-    echo -e "     ${DIM}Interactive module selection${NC}"
+    echo -e "  ${BOLD}Fonts:${NC}"
+    echo -e "  ${CYAN}${ICON_BULLET}${NC} MesloLGS Nerd Font"
     echo ""
-
-    while true; do
-        read -r -p "$(echo -e "${YELLOW}?${NC} Select profile [1-3]: ")" choice
-
-        case "$choice" in
-            1)
-                show_profile_details "minimal"
-                if confirm "Install Minimal profile?"; then
-                    echo "minimal"
-                    return 0
-                fi
-                ;;
-            2)
-                show_profile_details "developer"
-                if confirm "Install Developer profile?"; then
-                    echo "developer"
-                    return 0
-                fi
-                ;;
-            3)
-                show_profile_details "custom"
-                if confirm "Continue with Custom installation?"; then
-                    echo "custom"
-                    return 0
-                fi
-                ;;
-            *)
-                print_warning "Please enter 1, 2, or 3"
-                ;;
-        esac
-    done
-}
-
-# =============================================================================
-# Custom Module Selection
-# =============================================================================
-select_custom_modules() {
-    local -a selected_base=()
-    local -a selected_shell=()
-    local -a selected_fonts=()
-    local -a selected_prompt=()
-    local -a selected_plugins=()
-    local -a selected_utils=()
-
-    print_divider "Base Components"
+    echo -e "  ${BOLD}Prompt Theme:${NC}"
+    echo -e "  ${CYAN}${ICON_BULLET}${NC} Powerlevel10k"
     echo ""
-
-    # Always install base components
-    echo -e "  ${BOLD}Required:${NC}"
-    echo -e "  ${GREEN}${ICON_SUCCESS}${NC} Xcode Command Line Tools (if needed)"
-    echo -e "  ${GREEN}${ICON_SUCCESS}${NC} Homebrew"
+    echo -e "  ${BOLD}ZSH Plugins:${NC}"
+    echo -e "  ${CYAN}${ICON_BULLET}${NC} zsh-autosuggestions"
+    echo -e "  ${CYAN}${ICON_BULLET}${NC} zsh-syntax-highlighting"
+    echo -e "  ${CYAN}${ICON_BULLET}${NC} zsh-completions"
+    echo -e "  ${CYAN}${ICON_BULLET}${NC} zsh-history-substring-search"
     echo ""
-    selected_base=("xcode-cli" "homebrew")
-
-    # Shell framework
-    print_divider "Shell Framework"
-    if confirm "Install Oh My ZSH (ZSH framework)?"; then
-        selected_shell+=("oh-my-zsh")
-    fi
-
-    # Fonts
-    print_divider "Fonts"
-    if confirm "Install Nerd Fonts (required for icons)?"; then
-        echo -e "\n${BOLD}Select fonts to install:${NC}\n"
-        echo -e "  ${CYAN}1)${NC} MesloLGS NF (recommended for Powerlevel10k)"
-        echo -e "  ${CYAN}2)${NC} JetBrains Mono NF"
-        echo -e "  ${CYAN}3)${NC} All popular fonts"
-        echo ""
-
-        read -r -p "$(echo -e "${YELLOW}?${NC} Select font option [1-3]: ")" font_choice
-        case "$font_choice" in
-            1) selected_fonts=("meslo") ;;
-            2) selected_fonts=("jetbrains") ;;
-            3) selected_fonts=("all") ;;
-            *)
-                print_warning "Invalid selection. Using default: MesloLGS NF"
-                selected_fonts=("meslo")
-                ;;
-        esac
-    fi
-
-    # Prompt theme
-    print_divider "Prompt Theme"
-    echo -e "\n${BOLD}Select prompt theme:${NC}\n"
-    echo -e "  ${CYAN}1)${NC} Powerlevel10k (highly customizable, recommended)"
-    echo -e "  ${CYAN}2)${NC} Starship (minimal, fast)"
-    echo -e "  ${CYAN}3)${NC} None"
+    echo -e "  ${BOLD}CLI Utilities:${NC}"
+    echo -e "  ${CYAN}${ICON_BULLET}${NC} fzf (fuzzy finder)"
+    echo -e "  ${CYAN}${ICON_BULLET}${NC} bat (better cat)"
+    echo -e "  ${CYAN}${ICON_BULLET}${NC} eza (modern ls)"
+    echo -e "  ${CYAN}${ICON_BULLET}${NC} ripgrep (fast grep)"
+    echo -e "  ${CYAN}${ICON_BULLET}${NC} fd (find alternative)"
+    echo -e "  ${CYAN}${ICON_BULLET}${NC} zoxide (smart cd)"
+    echo -e "  ${CYAN}${ICON_BULLET}${NC} delta (git diff viewer)"
+    echo -e "  ${CYAN}${ICON_BULLET}${NC} lazygit (git TUI)"
     echo ""
-
-    read -r -p "$(echo -e "${YELLOW}?${NC} Select prompt [1-3]: ")" prompt_choice
-    case "$prompt_choice" in
-        1) selected_prompt=("powerlevel10k") ;;
-        2) selected_prompt=("starship") ;;
-        *) selected_prompt=() ;;
-    esac
-
-    # Plugins (only if Oh My ZSH selected)
-    if [[ " ${selected_shell[*]} " =~ " oh-my-zsh " ]]; then
-        print_divider "ZSH Plugins"
-        echo -e "\n${BOLD}Select plugins to install:${NC}\n"
-
-        local -a plugin_options=("zsh-autosuggestions" "zsh-syntax-highlighting" "zsh-completions" "zsh-history-substring-search")
-        for plugin in "${plugin_options[@]}"; do
-            if confirm "Install $plugin?"; then
-                selected_plugins+=("$plugin")
-            fi
-        done
-    fi
-
-    # Utilities
-    print_divider "CLI Utilities"
-    echo -e "\n${BOLD}Select utilities to install:${NC}\n"
-
-    local -a util_options=("fzf:Fuzzy finder" "bat:Better cat" "eza:Modern ls" "ripgrep:Fast grep" "fd:Find alternative" "zoxide:Smart cd" "delta:Git diff viewer" "lazygit:Git TUI" "btop:System monitor" "neofetch:System info")
-
-    for util_entry in "${util_options[@]}"; do
-        local util_name="${util_entry%%:*}"
-        local util_desc="${util_entry#*:}"
-        if confirm "Install $util_name ($util_desc)?"; then
-            selected_utils+=("$util_name")
-        fi
-    done
-
-    # Return selections via global variables
-    CUSTOM_BASE=("${selected_base[@]}")
-    CUSTOM_SHELL=("${selected_shell[@]}")
-    CUSTOM_FONTS=("${selected_fonts[@]}")
-    CUSTOM_PROMPT=("${selected_prompt[@]}")
-    CUSTOM_PLUGINS=("${selected_plugins[@]}")
-    CUSTOM_UTILS=("${selected_utils[@]}")
 }
 
 # =============================================================================
@@ -379,98 +216,96 @@ run_module() {
 # Installation Orchestration
 # =============================================================================
 calculate_steps() {
-    local profile="$1"
-
-    case "$profile" in
-        minimal)
-            TOTAL_STEPS=4  # xcode-cli, homebrew, oh-my-zsh, nerd-fonts, powerlevel10k
-            # Adjust: xcode-cli might be skipped if already installed
-            if xcode-select -p &>/dev/null; then
-                TOTAL_STEPS=3
-            fi
-            ;;
-        developer)
-            TOTAL_STEPS=16  # All modules
-            if xcode-select -p &>/dev/null; then
-                ((TOTAL_STEPS--))
-            fi
-            ;;
-        custom)
-            TOTAL_STEPS=${#CUSTOM_BASE[@]}
-            TOTAL_STEPS=$((TOTAL_STEPS + ${#CUSTOM_SHELL[@]}))
-            TOTAL_STEPS=$((TOTAL_STEPS + ${#CUSTOM_FONTS[@]}))
-            TOTAL_STEPS=$((TOTAL_STEPS + ${#CUSTOM_PROMPT[@]}))
-            TOTAL_STEPS=$((TOTAL_STEPS + ${#CUSTOM_PLUGINS[@]}))
-            TOTAL_STEPS=$((TOTAL_STEPS + ${#CUSTOM_UTILS[@]}))
-            ;;
-    esac
+    TOTAL_STEPS=16
+    if xcode-select -p &>/dev/null; then
+        ((TOTAL_STEPS--))
+    fi
 }
 
-install_profile() {
-    local profile="$1"
+run_installation() {
+    log "Starting installation"
 
-    log "Starting installation: profile=$profile"
+    # Phase 1: Base Components
+    # -------------------------------------------------------------------------
+    echo ""
+    ascii_section_header "Phase 1: Base Components" 50 "$BOLD_CYAN" "$DIM"
 
-    case "$profile" in
-        minimal)
-            source "${PROFILES_DIR}/minimal.sh"
-            run_minimal_profile
-            ;;
-        developer)
-            source "${PROFILES_DIR}/developer.sh"
-            run_developer_profile
-            ;;
-        custom)
-            run_custom_installation
-            ;;
-    esac
-}
+    # Xcode CLI - skip if already installed
+    if ! xcode-select -p &>/dev/null; then
+        run_module "${MODULES_BASE}/xcode-cli.sh" "Xcode Command Line Tools"
+    else
+        print_info "Xcode Command Line Tools already installed, skipping"
+    fi
 
-run_custom_installation() {
-    # Base modules (always required)
-    for module in "${CUSTOM_BASE[@]}"; do
-        case "$module" in
-            xcode-cli)
-                if ! xcode-select -p &>/dev/null; then
-                    run_module "${MODULES_BASE}/xcode-cli.sh" "Xcode Command Line Tools"
-                else
-                    print_info "Xcode Command Line Tools already installed, skipping"
-                fi
-                ;;
-            homebrew)
-                run_module "${MODULES_BASE}/homebrew.sh" "Homebrew"
-                ;;
-        esac
-    done
+    run_module "${MODULES_BASE}/homebrew.sh" "Homebrew"
 
-    # Shell framework
-    for module in "${CUSTOM_SHELL[@]}"; do
-        run_module "${MODULES_SHELL}/${module}.sh" "Oh My ZSH"
-    done
+    # Phase 2: Shell Framework
+    # -------------------------------------------------------------------------
+    echo ""
+    ascii_section_header "Phase 2: Shell Framework" 50 "$BOLD_CYAN" "$DIM"
 
-    # Fonts
-    for font in "${CUSTOM_FONTS[@]}"; do
-        if [[ "$font" == "all" ]]; then
-            run_module "${MODULES_FONTS}/nerd-fonts.sh" "Nerd Fonts" "install"
+    run_module "${MODULES_SHELL}/oh-my-zsh.sh" "Oh My ZSH"
+
+    # Phase 3: Fonts
+    # -------------------------------------------------------------------------
+    echo ""
+    ascii_section_header "Phase 3: Fonts" 50 "$BOLD_CYAN" "$DIM"
+
+    # Quick install MesloLGS specifically
+    ((CURRENT_STEP++))
+    echo ""
+    print_step "$CURRENT_STEP" "$TOTAL_STEPS" "Installing Nerd Fonts (MesloLGS)"
+    log "Starting: Nerd Fonts"
+
+    local module_path="${MODULES_FONTS}/nerd-fonts.sh"
+    if [[ -f "$module_path" ]]; then
+        if bash "$module_path" quick meslo; then
+            print_success "Nerd Fonts (MesloLGS) installed successfully"
+            INSTALLED_MODULES+=("Nerd Fonts (MesloLGS)")
+            log "SUCCESS: Nerd Fonts"
         else
-            run_module "${MODULES_FONTS}/nerd-fonts.sh" "Nerd Font ($font)" "quick $font"
+            print_warning "Issues with Nerd Fonts"
+            INSTALLED_MODULES+=("Nerd Fonts (with warnings)")
+            log "WARNING: Nerd Fonts had issues"
         fi
-    done
+    else
+        print_error "Module not found: $module_path"
+        FAILED_MODULES+=("Nerd Fonts")
+    fi
 
-    # Prompt theme
-    for prompt in "${CUSTOM_PROMPT[@]}"; do
-        run_module "${MODULES_PROMPT}/${prompt}.sh" "$prompt"
-    done
+    # Phase 4: Prompt Theme
+    # -------------------------------------------------------------------------
+    echo ""
+    ascii_section_header "Phase 4: Prompt Theme" 50 "$BOLD_CYAN" "$DIM"
 
-    # Plugins
-    for plugin in "${CUSTOM_PLUGINS[@]}"; do
-        run_module "${MODULES_PLUGINS}/${plugin}.sh" "$plugin"
-    done
+    run_module "${MODULES_PROMPT}/powerlevel10k.sh" "Powerlevel10k"
 
-    # Utilities
-    for util in "${CUSTOM_UTILS[@]}"; do
-        run_module "${MODULES_UTILS}/${util}.sh" "$util"
-    done
+    # Phase 5: ZSH Plugins
+    # -------------------------------------------------------------------------
+    echo ""
+    ascii_section_header "Phase 5: ZSH Plugins" 50 "$BOLD_CYAN" "$DIM"
+
+    run_module "${MODULES_PLUGINS}/zsh-autosuggestions.sh" "zsh-autosuggestions"
+    run_module "${MODULES_PLUGINS}/zsh-syntax-highlighting.sh" "zsh-syntax-highlighting"
+    run_module "${MODULES_PLUGINS}/zsh-completions.sh" "zsh-completions"
+    run_module "${MODULES_PLUGINS}/zsh-history-substring-search.sh" "zsh-history-substring-search"
+
+    # Phase 6: CLI Utilities
+    # -------------------------------------------------------------------------
+    echo ""
+    ascii_section_header "Phase 6: CLI Utilities" 50 "$BOLD_CYAN" "$DIM"
+
+    run_module "${MODULES_UTILS}/fzf.sh" "fzf (Fuzzy Finder)"
+    run_module "${MODULES_UTILS}/bat.sh" "bat (Better cat)"
+    run_module "${MODULES_UTILS}/eza.sh" "eza (Modern ls)"
+    run_module "${MODULES_UTILS}/ripgrep.sh" "ripgrep (Fast grep)"
+    run_module "${MODULES_UTILS}/fd.sh" "fd (Fast find)"
+    run_module "${MODULES_UTILS}/zoxide.sh" "zoxide (Smart cd)"
+    run_module "${MODULES_UTILS}/delta.sh" "delta (Git diffs)"
+    run_module "${MODULES_UTILS}/lazygit.sh" "lazygit (Git TUI)"
+
+    echo ""
+    print_divider "Installation Complete"
 }
 
 # =============================================================================
@@ -505,6 +340,52 @@ show_summary() {
     else
         echo -e "${BOLD_YELLOW}Installation completed with some errors.${NC}"
         echo -e "Check the log file for details: ${DIM}${LOG_FILE}${NC}"
+    fi
+
+    echo ""
+}
+
+# =============================================================================
+# Quick Tips
+# =============================================================================
+show_tips() {
+    print_divider "Quick Tips"
+
+    echo ""
+    echo -e "  ${BOLD}Installed utilities and their key commands:${NC}"
+    echo ""
+
+    # Check each utility and show tips
+    if command_exists fzf; then
+        echo -e "  ${CYAN}fzf${NC}      CTRL-T (files), CTRL-R (history), ALT-C (cd)"
+    fi
+
+    if command_exists bat; then
+        echo -e "  ${CYAN}bat${NC}      Use instead of 'cat' for syntax highlighting"
+    fi
+
+    if command_exists eza; then
+        echo -e "  ${CYAN}eza${NC}      Use 'eza -la' for colorful file listing"
+    fi
+
+    if command_exists rg; then
+        echo -e "  ${CYAN}ripgrep${NC}  Use 'rg <pattern>' for fast searching"
+    fi
+
+    if command_exists fd; then
+        echo -e "  ${CYAN}fd${NC}       Use 'fd <pattern>' for fast file finding"
+    fi
+
+    if command_exists zoxide; then
+        echo -e "  ${CYAN}zoxide${NC}   Use 'z <dir>' for smart directory jumping"
+    fi
+
+    if command_exists delta; then
+        echo -e "  ${CYAN}delta${NC}    Git diffs now have syntax highlighting"
+    fi
+
+    if command_exists lazygit; then
+        echo -e "  ${CYAN}lazygit${NC}  Run 'lazygit' for interactive git TUI"
     fi
 
     echo ""
@@ -556,21 +437,11 @@ show_help() {
     show_welcome
 
     echo -e "${BOLD}Usage:${NC}"
-    echo "  ./install.sh [profile]"
-    echo ""
-    echo -e "${BOLD}Profiles:${NC}"
-    echo "  (none)      Interactive installation with profile selection"
-    echo "  minimal     Quick minimal setup (Homebrew, Oh My ZSH, P10k)"
-    echo "  developer   Full developer setup with all tools"
+    echo "  ./install.sh"
     echo ""
     echo -e "${BOLD}Options:${NC}"
     echo "  --help, -h     Show this help message"
     echo "  --version, -v  Show version"
-    echo ""
-    echo -e "${BOLD}Examples:${NC}"
-    echo "  ./install.sh           # Interactive installation"
-    echo "  ./install.sh minimal   # Quick minimal setup"
-    echo "  ./install.sh developer # Full developer setup"
     echo ""
 }
 
@@ -593,36 +464,8 @@ main() {
             echo "DR Custom Terminal v${INSTALLER_VERSION}"
             exit 0
             ;;
-        minimal)
-            show_welcome
-            if ! preflight_checks; then
-                print_error "Pre-flight checks failed"
-                exit 1
-            fi
-            if confirm "Install Minimal profile?"; then
-                show_profile_details "minimal"
-                calculate_steps "minimal"
-                install_profile "minimal"
-                show_summary
-                show_next_steps
-            fi
-            ;;
-        developer)
-            show_welcome
-            if ! preflight_checks; then
-                print_error "Pre-flight checks failed"
-                exit 1
-            fi
-            if confirm "Install Developer profile?"; then
-                show_profile_details "developer"
-                calculate_steps "developer"
-                install_profile "developer"
-                show_summary
-                show_next_steps
-            fi
-            ;;
         *)
-            # Interactive mode
+            # Default installation flow
             show_welcome
 
             if ! preflight_checks; then
@@ -630,34 +473,17 @@ main() {
                 exit 1
             fi
 
-            # Select profile
-            local selected_profile
-            selected_profile=$(select_profile)
-
-            # Handle custom module selection
-            if [[ "$selected_profile" == "custom" ]]; then
-                select_custom_modules
-            fi
-
-            # Calculate steps and confirm
-            calculate_steps "$selected_profile"
+            show_installation_plan
 
             echo ""
-            print_divider "Ready to Install"
-            echo ""
-            echo -e "  ${BOLD}Profile:${NC} $selected_profile"
-            echo -e "  ${BOLD}Total modules:${NC} $TOTAL_STEPS"
-            echo ""
-
-            if ! confirm "Begin installation?"; then
+            if ! confirm "Start installation?"; then
                 print_info "Installation cancelled"
                 exit 0
             fi
 
-            # Run installation
-            install_profile "$selected_profile"
-
-            # Show summary and next steps
+            calculate_steps
+            run_installation
+            show_tips
             show_summary
             show_next_steps
             ;;

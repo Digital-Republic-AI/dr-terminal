@@ -1296,7 +1296,7 @@ uname -m
 **A:** The installer is designed for ZSH. Most tools work with bash, but Oh My ZSH and Powerlevel10k are ZSH-specific.
 
 ### Q: Can I install only specific modules?
-**A:** Yes! Use the Custom profile or run individual module installers:
+**A:** Yes! Run individual module installers directly:
 ```bash
 ./modules/utils/fzf.sh install
 ```
@@ -1315,10 +1315,7 @@ brew upgrade
 **A:** Absolutely! Run `p10k configure` anytime to customize, or edit `~/.p10k.zsh` directly.
 
 ### Q: How much disk space does this use?
-**A:**
-- Minimal profile: ~200MB
-- Developer profile: ~500MB
-- Custom varies by selection
+**A:** Approximately 500MB for a complete installation.
 
 ### Q: Can I run this multiple times?
 **A:** Yes, the installer is idempotent. It will skip already-installed components and offer to reconfigure them.

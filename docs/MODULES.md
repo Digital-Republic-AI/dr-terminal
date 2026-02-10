@@ -2342,16 +2342,13 @@ main() {
 7. **Cleanup:** Provide uninstall functionality
 8. **Documentation:** Include help text
 
-### Adding to Profiles
+### Adding to the Installer
 
-To include your module in installation profiles:
+To include your module in the installation, add a `run_module` call to the `run_installation()` function in `install.sh`:
 
-**profiles/developer.sh:**
 ```bash
-DEVELOPER_UTILS=(
-    # ... existing modules
-    "your-module:utils:Your Module Description"
-)
+# In the appropriate phase section of run_installation():
+run_module "${MODULES_UTILS}/your-module.sh" "Your Module"
 ```
 
 ---
