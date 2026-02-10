@@ -15,7 +15,7 @@
 
 <p align="center">
   <a href="#-início-rápido">Início Rápido</a> •
-  <a href="#-perfis-de-instalação">Perfis</a> •
+  <a href="#-o-que-será-instalado">Componentes</a> •
   <a href="#-ferramentas-incluídas">Ferramentas</a> •
   <a href="#-guia-de-uso">Guia de Uso</a> •
   <a href="#-estrutura-do-projeto">Estrutura</a>
@@ -47,70 +47,29 @@ O **DR Custom Terminal** é um toolkit modular completo para personalizar seu te
 
 ## 🚀 Início Rápido
 
-### Instalação em Uma Linha
-
 ```bash
 git clone https://github.com/yourusername/terminal-customization.git && cd terminal-customization && ./install.sh
 ```
 
-### Instalação Direta por Perfil
-
-```bash
-# 🟢 Instalação Mínima (~5 min, ~200MB)
-./install.sh minimal
-
-# 🔵 Instalação Completa para Desenvolvedores (~10 min, ~500MB)
-./install.sh developer
-
-# 🟣 Instalação Personalizada (escolha o que quer)
-./install.sh
-```
-
 ---
 
-## 📦 Perfis de Instalação
+## 📦 O que será instalado
 
-### 🟢 Perfil Minimal
-
-**Ideal para:** Setup rápido, overhead mínimo, recursos essenciais.
+O instalador configura automaticamente todos os componentes abaixo:
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│  ✓ Homebrew        Gerenciador de pacotes               │
-│  ✓ Oh My ZSH       Framework de configuração do ZSH     │
-│  ✓ MesloLGS NF     Fonte com ícones (Nerd Font)         │
-│  ✓ Powerlevel10k   Tema de prompt bonito e rápido       │
-└─────────────────────────────────────────────────────────┘
+Base Components          Shell e Prompt            Plugins ZSH
+  Xcode CLI Tools          Oh My ZSH                autosuggestions
+  Homebrew                 MesloLGS Nerd Font       syntax-highlighting
+                           Powerlevel10k            completions
+                                                    history-search
+
+CLI Utilities
+  fzf        Busca fuzzy          bat     cat melhor
+  eza        ls moderno           ripgrep grep rápido
+  fd         find simples         zoxide  cd esperto
+  delta      diff bonito          lazygit Git visual
 ```
-
-### 🔵 Perfil Developer
-
-**Ideal para:** Desenvolvedores, power users, produtividade máxima.
-
-```
-┌─────────────────────────────────────────────────────────┐
-│  ✓ Tudo do Minimal                                      │
-│  ─────────────────────────────────────────────────────  │
-│  Plugins ZSH:                                           │
-│  ✓ autosuggestions     Sugestões automáticas            │
-│  ✓ syntax-highlighting Coloração em tempo real          │
-│  ✓ completions         Autocomplete aprimorado          │
-│  ✓ history-search      Busca no histórico               │
-│  ─────────────────────────────────────────────────────  │
-│  Utilitários CLI:                                       │
-│  ✓ fzf      Busca fuzzy          ✓ bat     cat melhor   │
-│  ✓ eza      ls moderno           ✓ ripgrep grep rápido  │
-│  ✓ fd       find simples         ✓ zoxide  cd esperto   │
-│  ✓ delta    diff bonito          ✓ lazygit Git visual   │
-│  ✓ btop     monitor recursos     ✓ neofetch info sistema│
-└─────────────────────────────────────────────────────────┘
-```
-
-### 🟣 Perfil Custom
-
-**Ideal para:** Necessidades específicas, instalação seletiva.
-
-Escolha interativamente exatamente o que você quer instalar.
 
 ---
 
@@ -629,10 +588,6 @@ terminal-customization/
 │   ├── plugins/            #    Plugins ZSH
 │   └── utils/              #    Utilitários CLI
 │
-├── profiles/               # 👤 Perfis de instalação
-│   ├── minimal.sh          #    Perfil mínimo
-│   └── developer.sh        #    Perfil desenvolvedor
-│
 ├── themes/                 # 🎨 Customização visual
 │   ├── ascii-art/          #    Arte ASCII
 │   └── color-schemes/      #    Esquemas de cores
@@ -684,7 +639,7 @@ p10k configure
 |-----------|--------|
 | **Sistema** | macOS 10.15 (Catalina)+ |
 | **Shell** | Bash 3.2+ (para instalador) |
-| **Espaço** | 200MB - 500MB |
+| **Espaço** | ~500MB |
 | **Internet** | Necessária |
 
 ---

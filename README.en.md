@@ -15,7 +15,7 @@
 
 <p align="center">
   <a href="#-quick-start">Quick Start</a> •
-  <a href="#-installation-profiles">Profiles</a> •
+  <a href="#-whats-included">Components</a> •
   <a href="#-included-tools">Tools</a> •
   <a href="#-usage-guide">Usage Guide</a> •
   <a href="#-project-structure">Structure</a>
@@ -47,70 +47,29 @@
 
 ## 🚀 Quick Start
 
-### One-Line Installation
-
 ```bash
 git clone https://github.com/yourusername/terminal-customization.git && cd terminal-customization && ./install.sh
 ```
 
-### Direct Profile Installation
-
-```bash
-# 🟢 Minimal Installation (~5 min, ~200MB)
-./install.sh minimal
-
-# 🔵 Full Developer Installation (~10 min, ~500MB)
-./install.sh developer
-
-# 🟣 Custom Installation (choose what you want)
-./install.sh
-```
-
 ---
 
-## 📦 Installation Profiles
+## 📦 What's Included
 
-### 🟢 Minimal Profile
-
-**Ideal for:** Quick setup, minimal overhead, essential features.
+The installer automatically configures all components below:
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│  ✓ Homebrew        Package manager                      │
-│  ✓ Oh My ZSH       ZSH configuration framework          │
-│  ✓ MesloLGS NF     Icon font (Nerd Font)                │
-│  ✓ Powerlevel10k   Beautiful and fast prompt theme      │
-└─────────────────────────────────────────────────────────┘
+Base Components          Shell & Prompt            ZSH Plugins
+  Xcode CLI Tools          Oh My ZSH                autosuggestions
+  Homebrew                 MesloLGS Nerd Font       syntax-highlighting
+                           Powerlevel10k            completions
+                                                    history-search
+
+CLI Utilities
+  fzf        Fuzzy search         bat     Better cat
+  eza        Modern ls            ripgrep Fast grep
+  fd         Simple find          zoxide  Smart cd
+  delta      Beautiful diff       lazygit Visual Git
 ```
-
-### 🔵 Developer Profile
-
-**Ideal for:** Developers, power users, maximum productivity.
-
-```
-┌─────────────────────────────────────────────────────────┐
-│  ✓ Everything from Minimal                              │
-│  ─────────────────────────────────────────────────────  │
-│  ZSH Plugins:                                           │
-│  ✓ autosuggestions     Automatic suggestions            │
-│  ✓ syntax-highlighting Real-time coloring               │
-│  ✓ completions         Enhanced autocomplete            │
-│  ✓ history-search      History search                   │
-│  ─────────────────────────────────────────────────────  │
-│  CLI Utilities:                                         │
-│  ✓ fzf      Fuzzy search         ✓ bat     Better cat   │
-│  ✓ eza      Modern ls            ✓ ripgrep Fast grep    │
-│  ✓ fd       Simple find          ✓ zoxide  Smart cd     │
-│  ✓ delta    Beautiful diff       ✓ lazygit Visual Git   │
-│  ✓ btop     Resource monitor     ✓ neofetch System info │
-└─────────────────────────────────────────────────────────┘
-```
-
-### 🟣 Custom Profile
-
-**Ideal for:** Specific needs, selective installation.
-
-Interactively choose exactly what you want to install.
 
 ---
 
@@ -629,10 +588,6 @@ terminal-customization/
 │   ├── plugins/            #    ZSH plugins
 │   └── utils/              #    CLI utilities
 │
-├── profiles/               # 👤 Installation profiles
-│   ├── minimal.sh          #    Minimal profile
-│   └── developer.sh        #    Developer profile
-│
 ├── themes/                 # 🎨 Visual customization
 │   ├── ascii-art/          #    ASCII art
 │   └── color-schemes/      #    Color schemes
@@ -684,7 +639,7 @@ p10k configure
 |-------------|---------|
 | **System** | macOS 10.15 (Catalina)+ |
 | **Shell** | Bash 3.2+ (for installer) |
-| **Space** | 200MB - 500MB |
+| **Space** | ~500MB |
 | **Internet** | Required |
 
 ---
