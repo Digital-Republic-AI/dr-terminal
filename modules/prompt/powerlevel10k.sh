@@ -20,7 +20,9 @@
 #   - Nerd Font recommended for full icon support
 # =============================================================================
 
-set -e
+set -euo pipefail
+
+trap 'echo -e "\n${RED:-}Installation interrupted.${NC:-}"; exit 1' INT TERM
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
@@ -45,7 +47,7 @@ readonly P10K_MANUAL_DIR="$HOME/.powerlevel10k"
 # =============================================================================
 # ASCII Art Header
 # =============================================================================
-show_header() {
+show_ascii_header() {
     echo ""
     echo -e "${BOLD_CYAN}"
     cat << 'EOF'
@@ -65,40 +67,92 @@ EOF
 # Dependency Checks
 # =============================================================================
 check_dependencies() {
-    print_divider "Checking Dependencies"
+    local has_errors=0
 
-    local missing=()
+    for dep in "${MODULE_DEPS[@]}"; do
+        if ! command_exists "$dep"; then
+            print_error "Required dependency not found: $dep"
+            has_errors=1
+        fi
+    done
 
-    # Check git
-    if command_exists git; then
-        print_success "Git is installed"
-    else
-        print_error "Git is not installed"
-        missing+=("git")
+    return $has_errors
+}
+
+# =============================================================================
+# Installation Status Check
+# =============================================================================
+is_installed() {
+    [[ -d "$P10K_OMZ_DIR" ]] || [[ -d "$P10K_MANUAL_DIR" ]]
+}
+
+# =============================================================================
+# Get Version
+# =============================================================================
+get_version() {
+    local p10k_dir=""
+
+    if [[ -d "$P10K_OMZ_DIR/.git" ]]; then
+        p10k_dir="$P10K_OMZ_DIR"
+    elif [[ -d "$P10K_MANUAL_DIR/.git" ]]; then
+        p10k_dir="$P10K_MANUAL_DIR"
     fi
 
-    # Check Oh My ZSH
-    if has_omz; then
-        print_success "Oh My ZSH is installed"
+    if [[ -n "$p10k_dir" ]]; then
+        git -C "$p10k_dir" describe --tags --abbrev=0 2>/dev/null || echo "unknown"
     else
-        print_warning "Oh My ZSH is not installed (will use manual installation)"
+        echo "Not installed"
     fi
+}
 
-    # Check for Zsh as default shell
-    if is_zsh_default_shell; then
-        print_success "Zsh is your default shell"
-    else
-        print_warning "Zsh is not your default shell"
-        print_info "  Consider running: chsh -s \$(which zsh)"
-    fi
+# =============================================================================
+# Show Current Status
+# =============================================================================
+show_status() {
+    print_divider "Current Status"
 
-    if [[ ${#missing[@]} -gt 0 ]]; then
+    if is_installed; then
+        local version
+        version="$(get_version)"
+
+        echo -e "  ${ICON_SUCCESS} ${GREEN}Installed${NC}"
+        echo -e "  ${ICON_BULLET} Version: ${BOLD}${version}${NC}"
+
+        if [[ -d "$P10K_OMZ_DIR" ]]; then
+            echo -e "  ${ICON_BULLET} Location: ${DIM}${P10K_OMZ_DIR}${NC}"
+            echo -e "  ${ICON_BULLET} Mode: Oh My ZSH theme"
+        else
+            echo -e "  ${ICON_BULLET} Location: ${DIM}${P10K_MANUAL_DIR}${NC}"
+            echo -e "  ${ICON_BULLET} Mode: Manual installation"
+        fi
+
         echo ""
-        print_error "Missing required dependencies: ${missing[*]}"
-        return 1
+
+        local zshrc_path
+        zshrc_path="$(get_zshrc_path)"
+
+        if grep -Fq "powerlevel10k" "$zshrc_path" 2>/dev/null; then
+            print_success "Theme configured in .zshrc"
+        else
+            print_warning "Theme not configured in .zshrc"
+        fi
+
+        if grep -Fq "p10k-instant-prompt" "$zshrc_path" 2>/dev/null; then
+            print_success "Instant prompt enabled"
+        else
+            print_warning "Instant prompt not enabled"
+        fi
+
+        if [[ -f "$HOME/.p10k.zsh" ]]; then
+            print_success "p10k configuration file exists"
+        else
+            print_warning "No p10k configuration (run: p10k configure)"
+        fi
+    else
+        echo -e "  ${ICON_ERROR} ${RED}Not installed${NC}"
     fi
 
-    return 0
+    echo ""
 }
 
 # =============================================================================
@@ -109,7 +163,6 @@ check_nerd_fonts() {
 
     local nerd_font_installed=false
 
-    # Check for common Nerd Font installations
     local font_dirs=(
         "$HOME/Library/Fonts"
         "/Library/Fonts"
@@ -129,27 +182,27 @@ check_nerd_fonts() {
     if [[ "$nerd_font_installed" == true ]]; then
         print_success "Nerd Font detected"
         return 0
-    else
-        print_warning "No Nerd Font detected"
-        echo ""
-        echo -e "${YELLOW}Powerlevel10k works best with a Nerd Font for icons.${NC}"
-        echo ""
-        echo "  Recommended fonts:"
-        echo -e "  ${CYAN}${ICON_BULLET}${NC} MesloLGS NF (recommended by p10k)"
-        echo -e "  ${CYAN}${ICON_BULLET}${NC} JetBrainsMono Nerd Font"
-        echo -e "  ${CYAN}${ICON_BULLET}${NC} FiraCode Nerd Font"
-        echo -e "  ${CYAN}${ICON_BULLET}${NC} Hack Nerd Font"
-        echo ""
-        echo -e "  Install via: ${DIM}brew tap homebrew/cask-fonts && brew install font-meslo-lg-nerd-font${NC}"
-        echo ""
-
-        if confirm "Continue without Nerd Font?" "y"; then
-            return 0
-        else
-            print_info "Install a Nerd Font first, then run this installer again"
-            return 1
-        fi
     fi
+
+    print_warning "No Nerd Font detected"
+    echo ""
+    echo -e "${YELLOW}Powerlevel10k works best with a Nerd Font for icons.${NC}"
+    echo ""
+    echo "  Recommended fonts:"
+    echo -e "  ${CYAN}${ICON_BULLET}${NC} MesloLGS NF (recommended by p10k)"
+    echo -e "  ${CYAN}${ICON_BULLET}${NC} JetBrainsMono Nerd Font"
+    echo -e "  ${CYAN}${ICON_BULLET}${NC} FiraCode Nerd Font"
+    echo -e "  ${CYAN}${ICON_BULLET}${NC} Hack Nerd Font"
+    echo ""
+    echo -e "  Install via: ${DIM}brew install font-meslo-lg-nerd-font${NC}"
+    echo ""
+
+    if confirm "Continue without Nerd Font?" "y"; then
+        return 0
+    fi
+
+    print_info "Install a Nerd Font first, then run this installer again"
+    return 1
 }
 
 # =============================================================================
@@ -158,7 +211,6 @@ check_nerd_fonts() {
 install_with_omz() {
     print_divider "Installing for Oh My ZSH"
 
-    # Clone to Oh My ZSH custom themes directory
     if [[ -d "$P10K_OMZ_DIR" ]]; then
         print_info "Powerlevel10k already installed at: $P10K_OMZ_DIR"
 
@@ -173,7 +225,6 @@ install_with_omz() {
             fi
         fi
     else
-        # Fresh installation
         if clone_repo_shallow "$P10K_REPO" "$P10K_OMZ_DIR"; then
             print_success "Powerlevel10k cloned successfully"
         else
@@ -182,7 +233,6 @@ install_with_omz() {
         fi
     fi
 
-    # Configure as Oh My ZSH theme
     print_info "Configuring theme in .zshrc..."
     backup_zshrc
     set_omz_theme "powerlevel10k/powerlevel10k"
@@ -193,7 +243,6 @@ install_with_omz() {
 install_manual() {
     print_divider "Manual Installation (without Oh My ZSH)"
 
-    # Clone to home directory
     if [[ -d "$P10K_MANUAL_DIR" ]]; then
         print_info "Powerlevel10k already installed at: $P10K_MANUAL_DIR"
 
@@ -216,7 +265,6 @@ install_manual() {
         fi
     fi
 
-    # Add source to .zshrc
     print_info "Configuring .zshrc..."
     backup_zshrc
 
@@ -235,8 +283,7 @@ configure_instant_prompt() {
     local zshrc_path
     zshrc_path="$(get_zshrc_path)"
 
-    # Check if instant prompt is already configured
-    if grep -q "powerlevel10k-instant-prompt" "$zshrc_path" 2>/dev/null; then
+    if grep -Fq "p10k-instant-prompt" "$zshrc_path" 2>/dev/null; then
         print_info "Instant prompt already configured"
         return 0
     fi
@@ -249,15 +296,20 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi'
 
-        # Add instant prompt to top of .zshrc
         local temp_file
         temp_file="$(mktemp)"
+
         echo "$instant_prompt_block" > "$temp_file"
         echo "" >> "$temp_file"
         cat "$zshrc_path" >> "$temp_file"
-        mv "$temp_file" "$zshrc_path"
 
-        print_success "Instant prompt enabled"
+        if mv "$temp_file" "$zshrc_path"; then
+            print_success "Instant prompt enabled"
+        else
+            print_error "Failed to enable instant prompt"
+            rm -f "$temp_file"
+            return 1
+        fi
     fi
 }
 
@@ -267,8 +319,7 @@ configure_p10k_source() {
     local zshrc_path
     zshrc_path="$(get_zshrc_path)"
 
-    # Check if p10k source is already in .zshrc
-    if grep -q "\[p10k\].zsh" "$zshrc_path" 2>/dev/null; then
+    if grep -Fq ".p10k.zsh" "$zshrc_path" 2>/dev/null; then
         print_info "p10k configuration source already present"
         return 0
     fi
@@ -297,19 +348,9 @@ offer_configuration() {
 
     if confirm "Run the p10k configuration wizard now?" "y"; then
         echo ""
-        print_info "Starting p10k configuration wizard..."
-        print_info "This will customize your prompt appearance"
+        print_info "Please run the following command after restarting your shell:"
+        echo -e "  ${CYAN}p10k configure${NC}"
         echo ""
-
-        # The wizard needs to run in a new Zsh session
-        if [[ -n "${ZSH_VERSION:-}" ]]; then
-            # Already in Zsh, source and run
-            print_info "Please run 'p10k configure' after restarting your shell"
-        else
-            print_info "Starting a new Zsh session for configuration..."
-            echo ""
-            exec zsh -c 'source ~/.zshrc && p10k configure'
-        fi
     else
         echo ""
         print_info "You can configure Powerlevel10k anytime by running:"
@@ -348,7 +389,7 @@ show_instructions() {
 
     if ! check_nerd_fonts &>/dev/null; then
         echo -e "${YELLOW}Reminder:${NC} Install a Nerd Font for the best experience"
-        echo -e "  ${DIM}brew tap homebrew/cask-fonts && brew install font-meslo-lg-nerd-font${NC}"
+        echo -e "  ${DIM}brew install font-meslo-lg-nerd-font${NC}"
         echo ""
     fi
 
@@ -357,13 +398,43 @@ show_instructions() {
 }
 
 # =============================================================================
+# Install (full flow)
+# =============================================================================
+install() {
+    if ! check_dependencies; then
+        print_error "Missing dependencies. Please install git first."
+        return 1
+    fi
+
+    check_nerd_fonts || return 1
+
+    echo ""
+    if has_omz; then
+        install_with_omz || return 1
+    else
+        install_manual || return 1
+    fi
+
+    configure_instant_prompt
+    configure_p10k_source
+    show_instructions
+    offer_configuration
+
+    return 0
+}
+
+# =============================================================================
 # Uninstallation
 # =============================================================================
 uninstall() {
-    print_header "Uninstall ${MODULE_NAME}"
+    print_divider "Uninstall ${MODULE_NAME}"
+
+    if ! is_installed; then
+        print_info "Powerlevel10k is not installed"
+        return 0
+    fi
 
     if confirm "Remove Powerlevel10k and its configuration?" "n"; then
-        # Remove installation directory
         if [[ -d "$P10K_OMZ_DIR" ]]; then
             rm -rf "$P10K_OMZ_DIR"
             print_success "Removed: $P10K_OMZ_DIR"
@@ -374,7 +445,6 @@ uninstall() {
             print_success "Removed: $P10K_MANUAL_DIR"
         fi
 
-        # Remove p10k configuration
         if [[ -f "$HOME/.p10k.zsh" ]]; then
             if confirm "Remove ~/.p10k.zsh configuration?" "y"; then
                 rm -f "$HOME/.p10k.zsh"
@@ -382,7 +452,6 @@ uninstall() {
             fi
         fi
 
-        # Reset theme in .zshrc
         print_info "Remember to update ZSH_THEME in ~/.zshrc"
         print_info "And remove the Powerlevel10k source line and instant prompt"
 
@@ -393,58 +462,81 @@ uninstall() {
 }
 
 # =============================================================================
-# Main Installation Flow
+# Show Help
+# =============================================================================
+show_help() {
+    echo ""
+    echo -e "${BOLD}Powerlevel10k Installer${NC}"
+    echo ""
+    echo "Usage: $0 [command]"
+    echo ""
+    echo "Commands:"
+    echo "  install     Install Powerlevel10k (default)"
+    echo "  status      Show current installation status"
+    echo "  uninstall   Remove Powerlevel10k completely"
+    echo "  help        Show this help message"
+    echo ""
+    echo "Examples:"
+    echo "  $0              # Install Powerlevel10k"
+    echo "  $0 status       # Check installation status"
+    echo ""
+}
+
+# =============================================================================
+# Main Entry Point
 # =============================================================================
 main() {
-    show_header
+    local command="${1:-install}"
 
-    # Parse arguments
-    case "${1:-}" in
-        --uninstall|-u)
-            uninstall
-            return $?
+    show_ascii_header
+    print_header "$MODULE_NAME Installer"
+
+    case "$command" in
+        install)
+            if is_installed; then
+                show_status
+                print_warning "$MODULE_NAME is already installed"
+
+                if confirm "Reconfigure $MODULE_NAME?"; then
+                    if has_omz; then
+                        set_omz_theme "powerlevel10k/powerlevel10k"
+                    fi
+                    configure_instant_prompt
+                    configure_p10k_source
+                    offer_configuration
+                fi
+                exit 0
+            fi
+
+            install
             ;;
-        --help|-h)
-            echo "Usage: $0 [options]"
-            echo ""
-            echo "Options:"
-            echo "  --help, -h       Show this help message"
-            echo "  --uninstall, -u  Uninstall Powerlevel10k"
-            echo ""
-            return 0
+        status)
+            show_status
+            ;;
+        uninstall)
+            uninstall
+            ;;
+        help|--help|-h)
+            show_help
+            ;;
+        *)
+            print_error "Unknown command: $command"
+            show_help
+            exit 1
             ;;
     esac
 
-    # Check dependencies
-    if ! check_dependencies; then
-        return 1
+    local exit_code=$?
+
+    if [[ $exit_code -eq 0 && "$command" != "help" && "$command" != "status" ]]; then
+        echo ""
+        print_success "$MODULE_NAME operation complete!"
+        print_info "Restart your terminal or run 'source ~/.zshrc' to apply changes"
+        echo ""
     fi
 
-    # Check for Nerd Fonts
-    check_nerd_fonts || return 1
-
-    # Install based on Oh My ZSH presence
-    echo ""
-    if has_omz; then
-        install_with_omz || return 1
-    else
-        install_manual || return 1
-    fi
-
-    # Post-installation configuration
-    configure_instant_prompt
-    configure_p10k_source
-
-    # Show instructions
-    show_instructions
-
-    # Offer to run configuration wizard
-    offer_configuration
-
-    return 0
+    exit $exit_code
 }
 
-# Run main function if script is executed directly
-if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-    main "$@"
-fi
+# Run main if executed directly
+[[ "${BASH_SOURCE[0]}" == "${0}" ]] && main "$@"
