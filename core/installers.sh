@@ -43,23 +43,18 @@ fix_brew_permissions() {
         return 1
     fi
 
-    print_warning "Homebrew directories are not writable by your user"
+    local current_user
+    current_user="$(whoami)"
 
-    if confirm "Fix directory permissions? (requires sudo)"; then
-        local current_user
-        current_user="$(whoami)"
-
-        if sudo chown -R "$current_user" $dirs_line 2>/dev/null && \
-           chmod u+w $dirs_line 2>/dev/null; then
-            print_success "Directory permissions fixed"
-            return 0
-        else
-            print_error "Failed to fix permissions"
-            return 1
-        fi
+    print_info "Fixing directory permissions for ${current_user}..."
+    if sudo chown -R "$current_user" $dirs_line 2>/dev/null && \
+       chmod u+w $dirs_line 2>/dev/null; then
+        print_success "Directory permissions fixed"
+        return 0
+    else
+        print_error "Failed to fix directory permissions"
+        return 1
     fi
-
-    return 1
 }
 
 # =============================================================================
