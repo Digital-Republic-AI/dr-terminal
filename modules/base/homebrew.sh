@@ -692,23 +692,12 @@ main() {
             # Check if already installed
             if is_installed; then
                 show_status
-                print_warning "$MODULE_NAME is already installed"
-
-                if ! confirm "Reinstall $MODULE_NAME?"; then
-                    print_info "Skipping $MODULE_NAME installation"
-
-                    # Offer to run configuration anyway
-                    if confirm "Run post-installation configuration?"; then
-                        configure
-                    fi
-                    exit 0
-                fi
-
-                # Uninstall first, then install fresh
-                uninstall && install && configure
-            else
-                install && configure
+                print_success "$MODULE_NAME is already installed, skipping"
+                configure
+                exit 0
             fi
+
+            install && configure
             ;;
         update)
             if ! is_installed; then
