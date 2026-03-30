@@ -31,7 +31,7 @@ source "${PROJECT_ROOT}/themes/ascii-art/logos/main.sh"
 # =============================================================================
 # Installer Configuration
 # =============================================================================
-INSTALLER_VERSION="1.0.0"
+INSTALLER_VERSION="1.1.0"
 LOG_FILE="${PROJECT_ROOT}/.install.log"
 
 # Module paths
@@ -63,14 +63,7 @@ log() {
 # =============================================================================
 show_welcome() {
     clear
-
-    # Display main logo
     ascii_logo_main
-
-    echo ""
-    echo -e "${DIM}Version ${INSTALLER_VERSION} | macOS Terminal Setup${NC}"
-    echo ""
-    ascii_divider_fancy 68
     echo ""
 }
 
@@ -78,63 +71,55 @@ show_welcome() {
 # Pre-flight Checks
 # =============================================================================
 preflight_checks() {
-    print_divider "Pre-flight Checks"
-
     local has_errors=0
+    local warnings=()
 
-    # Check OS
-    if is_macos; then
-        print_success "macOS detected: $(sw_vers -productVersion 2>/dev/null || echo 'unknown')"
-    else
+    # Collect errors silently
+    if ! is_macos; then
         print_error "This installer is designed for macOS"
         has_errors=1
     fi
 
-    # Check architecture
-    local arch
-    arch="$(uname -m)"
-    print_info "Architecture: $arch"
-
-    # Check for internet connectivity
-    if has_internet; then
-        print_success "Internet connection available"
-    else
+    if ! has_internet; then
         print_error "No internet connection detected"
-        print_info "Please connect to the internet and try again"
         has_errors=1
     fi
 
-    # Check for required commands
-    if command_exists curl; then
-        print_success "curl is available"
-    else
+    if ! command_exists curl; then
         print_error "curl is required but not found"
         has_errors=1
     fi
 
-    if command_exists git; then
-        print_success "git is available"
-    else
-        print_warning "git is not installed (will be installed via Xcode CLT)"
+    if ! command_exists git; then
+        warnings+=("git not found (will be installed via Xcode CLT)")
     fi
 
-    # Check for existing installations
-    echo ""
-    print_info "Checking for existing installations..."
+    # Show warnings if any
+    for w in "${warnings[@]+"${warnings[@]}"}"; do
+        print_warning "$w"
+    done
 
-    if command_exists brew; then
-        print_info "  Homebrew: $(brew --version 2>/dev/null | head -1 | awk '{print $2}')"
-    else
-        print_info "  Homebrew: not installed"
+    # Show system info inline
+    if [[ $has_errors -eq 0 ]]; then
+        local mac_ver arch brew_status omz_status
+        mac_ver="$(sw_vers -productVersion 2>/dev/null || echo 'unknown')"
+        arch="$(uname -m)"
+
+        if command_exists brew; then
+            brew_status="${GREEN}$(brew --version 2>/dev/null | head -1 | awk '{print $2}')${NC}"
+        else
+            brew_status="${DIM}not installed${NC}"
+        fi
+
+        if [[ -d "$HOME/.oh-my-zsh" ]]; then
+            omz_status="${GREEN}installed${NC}"
+        else
+            omz_status="${DIM}not installed${NC}"
+        fi
+
+        echo -e "  ${DIM}macOS ${mac_ver} (${arch})${NC}  ${DIM}|${NC}  Homebrew: ${brew_status}  ${DIM}|${NC}  OMZ: ${omz_status}"
+        echo ""
     fi
-
-    if [[ -d "$HOME/.oh-my-zsh" ]]; then
-        print_info "  Oh My ZSH: installed"
-    else
-        print_info "  Oh My ZSH: not installed"
-    fi
-
-    echo ""
 
     return $has_errors
 }
@@ -146,34 +131,10 @@ show_installation_plan() {
     print_divider "What Will Be Installed"
 
     echo ""
-    echo -e "  ${BOLD}Base Components:${NC}"
-    echo -e "  ${CYAN}${ICON_BULLET}${NC} Xcode Command Line Tools"
-    echo -e "  ${CYAN}${ICON_BULLET}${NC} Homebrew (package manager)"
-    echo ""
-    echo -e "  ${BOLD}Shell Framework:${NC}"
-    echo -e "  ${CYAN}${ICON_BULLET}${NC} Oh My ZSH"
-    echo ""
-    echo -e "  ${BOLD}Fonts:${NC}"
-    echo -e "  ${CYAN}${ICON_BULLET}${NC} MesloLGS Nerd Font"
-    echo ""
-    echo -e "  ${BOLD}Prompt Theme:${NC}"
-    echo -e "  ${CYAN}${ICON_BULLET}${NC} Powerlevel10k"
-    echo ""
-    echo -e "  ${BOLD}ZSH Plugins:${NC}"
-    echo -e "  ${CYAN}${ICON_BULLET}${NC} zsh-autosuggestions"
-    echo -e "  ${CYAN}${ICON_BULLET}${NC} zsh-syntax-highlighting"
-    echo -e "  ${CYAN}${ICON_BULLET}${NC} zsh-completions"
-    echo -e "  ${CYAN}${ICON_BULLET}${NC} zsh-history-substring-search"
-    echo ""
-    echo -e "  ${BOLD}CLI Utilities:${NC}"
-    echo -e "  ${CYAN}${ICON_BULLET}${NC} fzf (fuzzy finder)"
-    echo -e "  ${CYAN}${ICON_BULLET}${NC} bat (better cat)"
-    echo -e "  ${CYAN}${ICON_BULLET}${NC} eza (modern ls)"
-    echo -e "  ${CYAN}${ICON_BULLET}${NC} ripgrep (fast grep)"
-    echo -e "  ${CYAN}${ICON_BULLET}${NC} fd (find alternative)"
-    echo -e "  ${CYAN}${ICON_BULLET}${NC} zoxide (smart cd)"
-    echo -e "  ${CYAN}${ICON_BULLET}${NC} delta (git diff viewer)"
-    echo -e "  ${CYAN}${ICON_BULLET}${NC} lazygit (git TUI)"
+    echo -e "  ${BOLD}Base${NC}        Xcode CLT, Homebrew"
+    echo -e "  ${BOLD}Shell${NC}       Oh My ZSH + ${CYAN}autosuggestions${NC}, ${CYAN}syntax-highlighting${NC}, ${CYAN}completions${NC}, ${CYAN}history-search${NC}"
+    echo -e "  ${BOLD}Theme${NC}       Powerlevel10k + MesloLGS Nerd Font"
+    echo -e "  ${BOLD}Utilities${NC}   fzf, bat, eza, ripgrep, fd, zoxide, delta, lazygit"
     echo ""
 }
 
