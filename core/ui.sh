@@ -260,7 +260,10 @@ confirm() {
     local prompt
     local response
 
-    if [[ "${default,,}" == "y" ]]; then
+    local default_lower
+    default_lower=$(echo "$default" | tr '[:upper:]' '[:lower:]')
+
+    if [[ "$default_lower" == "y" ]]; then
         prompt="${question} [Y/n]: "
     else
         prompt="${question} [y/N]: "
@@ -269,8 +272,10 @@ confirm() {
     while true; do
         read -r -p "$(echo -e "${YELLOW}?${NC} ${prompt}")" response
         response="${response:-$default}"
+        local response_lower
+        response_lower=$(echo "$response" | tr '[:upper:]' '[:lower:]')
 
-        case "${response,,}" in
+        case "$response_lower" in
             y|yes)
                 return 0
                 ;;
@@ -353,7 +358,9 @@ select_multiple() {
         read -r -p "$(echo -e "${YELLOW}?${NC} Enter choices: ")" input
 
         # Handle 'all' selection
-        if [[ "${input,,}" == "all" ]]; then
+        local input_lower
+        input_lower=$(echo "$input" | tr '[:upper:]' '[:lower:]')
+        if [[ "$input_lower" == "all" ]]; then
             for ((i = 1; i <= num_options; i++)); do
                 selected+=("$i")
             done

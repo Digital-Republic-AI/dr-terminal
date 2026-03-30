@@ -243,7 +243,9 @@ parse_font_selection() {
     local selected_fonts=()
 
     # Handle 'all' selection
-    if [[ "${input,,}" == "all" || "$input" == "7" ]]; then
+    local input_lower
+    input_lower=$(echo "$input" | tr '[:upper:]' '[:lower:]')
+    if [[ "$input_lower" == "all" || "$input" == "7" ]]; then
         echo "${FONT_KEYS[*]}"
         return 0
     fi
@@ -435,7 +437,9 @@ uninstall() {
     local fonts_to_remove=()
 
     # Handle 'all' selection
-    if [[ "${input,,}" == "all" || "$input" == "$all_option" ]]; then
+    local input_lower
+    input_lower=$(echo "$input" | tr '[:upper:]' '[:lower:]')
+    if [[ "$input_lower" == "all" || "$input" == "$all_option" ]]; then
         fonts_to_remove=("${installed_fonts[@]}")
     else
         for choice in $input; do
