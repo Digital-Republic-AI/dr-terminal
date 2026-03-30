@@ -397,32 +397,16 @@ fix_directory_permissions() {
         return 1
     fi
 
-    print_warning "Some Homebrew directories are not writable by your user"
+    local current_user
+    current_user="$(whoami)"
 
-    if confirm "Fix directory permissions automatically? (requires sudo)"; then
-        local current_user
-        current_user="$(whoami)"
-
-        print_info "Fixing ownership for ${current_user}..."
-        if sudo chown -R "$current_user" $dirs_line 2>/dev/null; then
-            print_success "Directory ownership updated"
-        else
-            print_error "Failed to update directory ownership"
-            return 1
-        fi
-
-        if chmod u+w $dirs_line 2>/dev/null; then
-            print_success "Write permissions granted"
-        else
-            print_error "Failed to update write permissions"
-            return 1
-        fi
-
+    print_info "Fixing directory permissions for ${current_user}..."
+    if sudo chown -R "$current_user" $dirs_line 2>/dev/null && \
+       chmod u+w $dirs_line 2>/dev/null; then
+        print_success "Directory permissions fixed"
         return 0
     else
-        print_info "Skipped. You can fix manually with:"
-        echo -e "  ${DIM}sudo chown -R \$(whoami) ${dirs_line}${NC}"
-        echo -e "  ${DIM}chmod u+w ${dirs_line}${NC}"
+        print_error "Failed to fix directory permissions"
         return 1
     fi
 }
@@ -440,19 +424,12 @@ fix_missing_git_remote() {
     local brew_repo
     brew_repo="$(brew --repository 2>/dev/null || echo "/usr/local/Homebrew")"
 
-    print_warning "Homebrew git repository is missing its origin remote"
-
-    if confirm "Add the missing git origin remote?"; then
-        if git -C "$brew_repo" remote add origin https://github.com/Homebrew/brew 2>/dev/null; then
-            print_success "Git origin remote added"
-            return 0
-        else
-            print_error "Failed to add git remote"
-            return 1
-        fi
+    print_info "Adding missing git origin remote..."
+    if git -C "$brew_repo" remote add origin https://github.com/Homebrew/brew 2>/dev/null; then
+        print_success "Git origin remote added"
+        return 0
     else
-        print_info "Skipped. You can fix manually with:"
-        echo -e "  ${DIM}git -C \"${brew_repo}\" remote add origin https://github.com/Homebrew/brew${NC}"
+        print_error "Failed to add git remote"
         return 1
     fi
 }
