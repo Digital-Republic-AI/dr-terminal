@@ -120,35 +120,35 @@ print_divider() {
 # Arguments:
 #   $1 - Message text
 print_success() {
-    echo -e "${SUCCESS}${ICON_SUCCESS}${NC} $1"
+    printf '%b\n' "${SUCCESS}${ICON_SUCCESS}${NC} $1"
 }
 
 # Print error message with X icon
 # Arguments:
 #   $1 - Message text
 print_error() {
-    echo -e "${ERROR}${ICON_ERROR}${NC} $1" >&2
+    printf '%b\n' "${ERROR}${ICON_ERROR}${NC} $1" >&2
 }
 
 # Print warning message with exclamation icon
 # Arguments:
 #   $1 - Message text
 print_warning() {
-    echo -e "${WARNING}${ICON_WARNING}${NC} $1"
+    printf '%b\n' "${WARNING}${ICON_WARNING}${NC} $1"
 }
 
 # Print info message with arrow icon
 # Arguments:
 #   $1 - Message text
 print_info() {
-    echo -e "${INFO}${ICON_INFO}${NC} $1"
+    printf '%b\n' "${INFO}${ICON_INFO}${NC} $1"
 }
 
 # Print debug message (only if DEBUG is set)
 # Arguments:
 #   $1 - Message text
 print_debug() {
-    [[ "${DEBUG_MODE:-0}" == "1" ]] && echo -e "${DIM}[DEBUG] $1${NC}" >&2
+    [[ "${DEBUG_MODE:-0}" == "1" ]] && printf '%b\n' "${DIM}[DEBUG] $1${NC}" >&2
 }
 
 # =============================================================================
