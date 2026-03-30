@@ -431,9 +431,9 @@ list_plugins_omz() {
         return 1
     fi
 
-    # Extract plugins from the array
-    grep -oE "^plugins=\([^)]+\)" "$zshrc_path" | \
-    sed 's/plugins=(//' | sed 's/)//' | tr '\n' ' ' | tr -s ' '
+    # Extract plugins from the array (single-line format only)
+    grep -oE "^plugins=\([^)]+\)" "$zshrc_path" 2>/dev/null | \
+    sed 's/plugins=(//' | sed 's/)//' | tr '\n' ' ' | tr -s ' ' || true
 }
 
 # Install an Oh My ZSH custom plugin from GitHub

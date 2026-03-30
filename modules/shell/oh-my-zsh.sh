@@ -160,14 +160,14 @@ show_status() {
         zshrc_path="$(get_zshrc_path)"
         if [[ -f "$zshrc_path" ]]; then
             local current_theme
-            current_theme=$(grep "^ZSH_THEME=" "$zshrc_path" 2>/dev/null | cut -d'"' -f2)
+            current_theme=$(grep "^ZSH_THEME=" "$zshrc_path" 2>/dev/null | cut -d'"' -f2) || true
             if [[ -n "$current_theme" ]]; then
                 echo -e "  ${ICON_BULLET} Current theme: ${BOLD}${current_theme}${NC}"
             fi
 
             # Show enabled plugins
             local plugins
-            plugins=$(list_plugins_omz)
+            plugins=$(list_plugins_omz) || true
             if [[ -n "$plugins" ]]; then
                 echo -e "  ${ICON_BULLET} Enabled plugins: ${DIM}${plugins}${NC}"
             fi
@@ -343,6 +343,12 @@ ZSHRC
         fi
     fi
 
+    # Ensure export ZSH= is set
+    if ! grep -q "^export ZSH=" "$zshrc_path"; then
+        print_info "Adding ZSH export path"
+        add_to_zshrc "export ZSH=\"\$HOME/.oh-my-zsh\"" "Path to your oh-my-zsh installation" "top"
+    fi
+
     # Ensure ZSH_THEME is set
     if ! grep -q "^ZSH_THEME=" "$zshrc_path"; then
         print_info "Setting default theme: ${DEFAULT_THEME}"
@@ -357,6 +363,12 @@ ZSHRC
         echo "" >> "$zshrc_path"
         echo "# Oh My ZSH Plugins" >> "$zshrc_path"
         echo "plugins=(${DEFAULT_PLUGINS})" >> "$zshrc_path"
+    fi
+
+    # Ensure source $ZSH/oh-my-zsh.sh exists
+    if ! grep -q 'source.*oh-my-zsh\.sh' "$zshrc_path"; then
+        print_info "Adding Oh My ZSH source"
+        add_to_zshrc 'source $ZSH/oh-my-zsh.sh' "Load Oh My ZSH" "after:^plugins="
     fi
 
     # Create custom directories if they don't exist
