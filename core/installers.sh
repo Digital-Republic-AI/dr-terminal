@@ -24,6 +24,45 @@ source "${CORE_DIR}/ui.sh"
 source "${CORE_DIR}/validators.sh"
 
 # =============================================================================
+# Homebrew Permission Fix
+# =============================================================================
+
+# Detect and fix Homebrew directory permission issues
+# Returns: 0 if fixed or no issues, 1 if fix failed or declined
+fix_brew_permissions() {
+    local brew_output="$1"
+
+    if ! echo "$brew_output" | grep -q "not writable by your user"; then
+        return 1
+    fi
+
+    local dirs_line
+    dirs_line="$(echo "$brew_output" | grep "^/" | tr '\n' ' ')"
+
+    if [[ -z "$dirs_line" ]]; then
+        return 1
+    fi
+
+    print_warning "Homebrew directories are not writable by your user"
+
+    if confirm "Fix directory permissions? (requires sudo)"; then
+        local current_user
+        current_user="$(whoami)"
+
+        if sudo chown -R "$current_user" $dirs_line 2>/dev/null && \
+           chmod u+w $dirs_line 2>/dev/null; then
+            print_success "Directory permissions fixed"
+            return 0
+        else
+            print_error "Failed to fix permissions"
+            return 1
+        fi
+    fi
+
+    return 1
+}
+
+# =============================================================================
 # Homebrew Installation Functions
 # =============================================================================
 
@@ -52,10 +91,25 @@ install_with_brew() {
     if spinner "Installing $display_name" brew install "$package"; then
         print_success "$display_name installed successfully"
         return 0
-    else
-        print_error "Failed to install $display_name"
-        return 1
     fi
+
+    # Capture error output for diagnosis
+    local brew_output
+    brew_output="$(brew install "$package" 2>&1)" || true
+
+    # Check for permission errors and attempt fix
+    if echo "$brew_output" | grep -q "not writable by your user"; then
+        if fix_brew_permissions "$brew_output"; then
+            print_info "Retrying installation of $display_name..."
+            if spinner "Installing $display_name" brew install "$package"; then
+                print_success "$display_name installed successfully"
+                return 0
+            fi
+        fi
+    fi
+
+    print_error "Failed to install $display_name"
+    return 1
 }
 
 # Install multiple packages using Homebrew
@@ -545,7 +599,7 @@ uninstall_brew() {
 # =============================================================================
 # Export Functions
 # =============================================================================
-export -f install_with_brew install_with_brew_multiple install_with_cask
+export -f fix_brew_permissions install_with_brew install_with_brew_multiple install_with_cask
 export -f update_brew brew_formula_installed brew_cask_installed
 export -f clone_repo clone_repo_shallow
 export -f download_file download_and_extract_tar download_and_extract_zip
