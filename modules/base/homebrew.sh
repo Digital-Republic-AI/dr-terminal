@@ -386,6 +386,78 @@ install() {
 }
 
 # =============================================================================
+# Fix: Directory Permissions
+# =============================================================================
+fix_directory_permissions() {
+    local doctor_output="$1"
+    local dirs_line
+    dirs_line="$(echo "$doctor_output" | grep -A 100 "not writable by your user" | grep "^/" | tr '\n' ' ')"
+
+    if [[ -z "$dirs_line" ]]; then
+        return 1
+    fi
+
+    print_warning "Some Homebrew directories are not writable by your user"
+
+    if confirm "Fix directory permissions automatically? (requires sudo)"; then
+        local current_user
+        current_user="$(whoami)"
+
+        print_info "Fixing ownership for ${current_user}..."
+        if sudo chown -R "$current_user" $dirs_line 2>/dev/null; then
+            print_success "Directory ownership updated"
+        else
+            print_error "Failed to update directory ownership"
+            return 1
+        fi
+
+        if chmod u+w $dirs_line 2>/dev/null; then
+            print_success "Write permissions granted"
+        else
+            print_error "Failed to update write permissions"
+            return 1
+        fi
+
+        return 0
+    else
+        print_info "Skipped. You can fix manually with:"
+        echo -e "  ${DIM}sudo chown -R \$(whoami) ${dirs_line}${NC}"
+        echo -e "  ${DIM}chmod u+w ${dirs_line}${NC}"
+        return 1
+    fi
+}
+
+# =============================================================================
+# Fix: Missing Git Origin Remote
+# =============================================================================
+fix_missing_git_remote() {
+    local doctor_output="$1"
+
+    if ! echo "$doctor_output" | grep -q "Missing.*git origin remote"; then
+        return 1
+    fi
+
+    local brew_repo
+    brew_repo="$(brew --repository 2>/dev/null || echo "/usr/local/Homebrew")"
+
+    print_warning "Homebrew git repository is missing its origin remote"
+
+    if confirm "Add the missing git origin remote?"; then
+        if git -C "$brew_repo" remote add origin https://github.com/Homebrew/brew 2>/dev/null; then
+            print_success "Git origin remote added"
+            return 0
+        else
+            print_error "Failed to add git remote"
+            return 1
+        fi
+    else
+        print_info "Skipped. You can fix manually with:"
+        echo -e "  ${DIM}git -C \"${brew_repo}\" remote add origin https://github.com/Homebrew/brew${NC}"
+        return 1
+    fi
+}
+
+# =============================================================================
 # Configure (Post-Installation)
 # =============================================================================
 configure() {
@@ -399,15 +471,42 @@ configure() {
         eval "$("${brew_prefix}/bin/brew" shellenv)"
     fi
 
-    # Run brew doctor
+    # Run brew doctor and capture output
     print_info "Running brew doctor to check installation health..."
     echo ""
 
-    if brew doctor 2>&1; then
+    local doctor_output
+    local doctor_exit_code=0
+    doctor_output="$(brew doctor 2>&1)" || doctor_exit_code=$?
+
+    if [[ $doctor_exit_code -eq 0 ]]; then
         print_success "Homebrew installation is healthy"
     else
         print_warning "brew doctor reported some warnings"
-        print_info "These are usually informational and can be ignored"
+        echo ""
+
+        local fixes_applied=0
+
+        # Attempt to fix known issues
+        if echo "$doctor_output" | grep -q "not writable by your user"; then
+            fix_directory_permissions "$doctor_output" && ((fixes_applied++))
+            echo ""
+        fi
+
+        if echo "$doctor_output" | grep -q "Missing.*git origin remote"; then
+            fix_missing_git_remote "$doctor_output" && ((fixes_applied++))
+            echo ""
+        fi
+
+        if [[ $fixes_applied -gt 0 ]]; then
+            print_info "Re-running brew doctor to verify fixes..."
+            echo ""
+            if brew doctor 2>&1; then
+                print_success "All issues resolved"
+            else
+                print_warning "Some warnings remain (usually informational)"
+            fi
+        fi
     fi
 
     echo ""
