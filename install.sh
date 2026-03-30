@@ -159,18 +159,18 @@ run_module() {
         return 1
     fi
 
-    # Run the module
+    # Run the module (never abort the installer on failure)
     if bash "$module_path" $options; then
         print_success "$module_name installed successfully"
         INSTALLED_MODULES+=("$module_name")
         log "SUCCESS: $module_name installed"
-        return 0
     else
-        print_error "Failed to install $module_name"
+        print_warning "Skipping $module_name (installation failed)"
         FAILED_MODULES+=("$module_name")
-        log "ERROR: Failed to install $module_name"
-        return 1
+        log "WARNING: Skipping $module_name"
     fi
+
+    return 0
 }
 
 # =============================================================================
