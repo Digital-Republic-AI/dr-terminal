@@ -246,10 +246,19 @@ run_installation() {
     echo ""
     ascii_section_header "Phase 5: ZSH Plugins" 50 "$BOLD_CYAN" "$DIM"
 
-    run_module "${MODULES_PLUGINS}/zsh-autosuggestions.sh" "zsh-autosuggestions"
-    run_module "${MODULES_PLUGINS}/zsh-syntax-highlighting.sh" "zsh-syntax-highlighting"
-    run_module "${MODULES_PLUGINS}/zsh-completions.sh" "zsh-completions"
-    run_module "${MODULES_PLUGINS}/zsh-history-substring-search.sh" "zsh-history-substring-search"
+    echo ""
+    echo -e "  Plugins: ${CYAN}autosuggestions${NC}, ${CYAN}syntax-highlighting${NC}, ${CYAN}completions${NC}, ${CYAN}history-search${NC}"
+    echo ""
+
+    if confirm "Install ZSH plugins?" "y"; then
+        run_module "${MODULES_PLUGINS}/zsh-autosuggestions.sh" "zsh-autosuggestions"
+        run_module "${MODULES_PLUGINS}/zsh-syntax-highlighting.sh" "zsh-syntax-highlighting"
+        run_module "${MODULES_PLUGINS}/zsh-completions.sh" "zsh-completions"
+        run_module "${MODULES_PLUGINS}/zsh-history-substring-search.sh" "zsh-history-substring-search"
+    else
+        print_info "Skipping ZSH plugins"
+        ((TOTAL_STEPS -= 4))
+    fi
 
     # Phase 6: CLI Utilities
     # -------------------------------------------------------------------------
