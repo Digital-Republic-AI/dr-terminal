@@ -192,32 +192,18 @@ check_nerd_fonts() {
     local nerd_fonts_script="${PROJECT_ROOT}/modules/fonts/nerd-fonts.sh"
 
     if [[ -f "$nerd_fonts_script" ]] && has_brew; then
-        if confirm "Install MesloLGS NF (recommended for Powerlevel10k)?" "y"; then
-            if bash "$nerd_fonts_script" quick meslo; then
-                print_success "MesloLGS NF installed"
-                return 0
-            else
-                print_warning "Font installation failed"
-            fi
+        print_info "Installing MesloLGS NF..."
+        if bash "$nerd_fonts_script" quick meslo; then
+            print_success "MesloLGS NF installed"
+            return 0
         fi
+        print_warning "Font installation failed, continuing without Nerd Font"
     else
-        echo "  Recommended fonts:"
-        echo -e "  ${CYAN}${ICON_BULLET}${NC} MesloLGS NF (recommended by p10k)"
-        echo -e "  ${CYAN}${ICON_BULLET}${NC} JetBrainsMono Nerd Font"
-        echo -e "  ${CYAN}${ICON_BULLET}${NC} FiraCode Nerd Font"
-        echo -e "  ${CYAN}${ICON_BULLET}${NC} Hack Nerd Font"
-        echo ""
-        echo -e "  Install via: ${DIM}brew install font-meslo-lg-nerd-font${NC}"
+        print_warning "Homebrew not available, skipping font installation"
+        print_info "Install manually later: brew install font-meslo-lg-nerd-font"
     fi
 
-    echo ""
-
-    if confirm "Continue without Nerd Font?" "n"; then
-        return 0
-    fi
-
-    print_info "Install a Nerd Font first, then run this installer again"
-    return 1
+    return 0
 }
 
 # =============================================================================
