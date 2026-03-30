@@ -2,7 +2,7 @@
   <img src="https://img.shields.io/badge/macOS-10.15+-blue?style=for-the-badge&logo=apple&logoColor=white" alt="macOS">
   <img src="https://img.shields.io/badge/Shell-Bash%20%7C%20ZSH-green?style=for-the-badge&logo=gnu-bash&logoColor=white" alt="Shell">
   <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" alt="License">
-  <img src="https://img.shields.io/badge/Version-1.0.0-purple?style=for-the-badge" alt="Version">
+  <img src="https://img.shields.io/badge/Version-1.1.0-purple?style=for-the-badge" alt="Version">
 </p>
 
 <h1 align="center">

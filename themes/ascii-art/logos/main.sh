@@ -76,7 +76,7 @@ ascii_logo_main() {
     echo -e "${dim}${BOX_V}${ASCII_RESET}  ${accent}| |___| |_| | ___) | | | | |_| || |  | | | |  / /_  | |___      ${dim}${BOX_V}${ASCII_RESET}"
     echo -e "${dim}${BOX_V}${ASCII_RESET}  ${accent} \\____|\\___/ |____/  |_|  \\___/ |_|  |_||___|/____| |_____|     ${dim}${BOX_V}${ASCII_RESET}"
     echo -e "${dim}${BOX_V}${ASCII_RESET}                                                                    ${dim}${BOX_V}${ASCII_RESET}"
-    echo -e "${dim}${BOX_V}${ASCII_RESET}        ${ASCII_BRIGHT_WHITE}DR Custom Terminal${ASCII_RESET} ${ASCII_BRIGHT_GREEN}v1.0.0${ASCII_RESET}                    ${dim}${BOX_V}${ASCII_RESET}"
+    echo -e "${dim}${BOX_V}${ASCII_RESET}        ${ASCII_BRIGHT_WHITE}DR Custom Terminal${ASCII_RESET} ${ASCII_BRIGHT_GREEN}v1.1.0${ASCII_RESET}                    ${dim}${BOX_V}${ASCII_RESET}"
     echo -e "${dim}${BOX_V}${ASCII_RESET}        ${ASCII_BRIGHT_BLACK}Your complete macOS terminal setup solution${ASCII_RESET}               ${dim}${BOX_V}${ASCII_RESET}"
     echo -e "${dim}${BOX_BL}$(printf '%0.s═' {1..66})${BOX_BR}${ASCII_RESET}"
 }
