@@ -437,7 +437,7 @@ main() {
             show_installation_plan
 
             echo ""
-            if ! confirm "Start installation?"; then
+            if ! confirm "Start installation?" "y"; then
                 print_info "Installation cancelled"
                 exit 0
             fi
