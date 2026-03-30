@@ -188,16 +188,31 @@ check_nerd_fonts() {
     echo ""
     echo -e "${YELLOW}Powerlevel10k works best with a Nerd Font for icons.${NC}"
     echo ""
-    echo "  Recommended fonts:"
-    echo -e "  ${CYAN}${ICON_BULLET}${NC} MesloLGS NF (recommended by p10k)"
-    echo -e "  ${CYAN}${ICON_BULLET}${NC} JetBrainsMono Nerd Font"
-    echo -e "  ${CYAN}${ICON_BULLET}${NC} FiraCode Nerd Font"
-    echo -e "  ${CYAN}${ICON_BULLET}${NC} Hack Nerd Font"
-    echo ""
-    echo -e "  Install via: ${DIM}brew install font-meslo-lg-nerd-font${NC}"
+
+    local nerd_fonts_script="${PROJECT_ROOT}/modules/fonts/nerd-fonts.sh"
+
+    if [[ -f "$nerd_fonts_script" ]] && has_brew; then
+        if confirm "Install MesloLGS NF (recommended for Powerlevel10k)?" "y"; then
+            if bash "$nerd_fonts_script" quick meslo; then
+                print_success "MesloLGS NF installed"
+                return 0
+            else
+                print_warning "Font installation failed"
+            fi
+        fi
+    else
+        echo "  Recommended fonts:"
+        echo -e "  ${CYAN}${ICON_BULLET}${NC} MesloLGS NF (recommended by p10k)"
+        echo -e "  ${CYAN}${ICON_BULLET}${NC} JetBrainsMono Nerd Font"
+        echo -e "  ${CYAN}${ICON_BULLET}${NC} FiraCode Nerd Font"
+        echo -e "  ${CYAN}${ICON_BULLET}${NC} Hack Nerd Font"
+        echo ""
+        echo -e "  Install via: ${DIM}brew install font-meslo-lg-nerd-font${NC}"
+    fi
+
     echo ""
 
-    if confirm "Continue without Nerd Font?" "y"; then
+    if confirm "Continue without Nerd Font?" "n"; then
         return 0
     fi
 
