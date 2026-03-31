@@ -7,11 +7,11 @@
 
 <h1 align="center">
   <br>
-  🖥️ DR Custom Terminal
+  DR Custom Terminal
   <br>
 </h1>
 
-<h4 align="center">Transforme seu terminal macOS de básico para brilhante em minutos.</h4>
+<h4 align="center">Automated terminal customization and configuration toolkit for macOS.</h4>
 
 <p align="center">
   <a href="#-início-rápido">Início Rápido</a> •
@@ -23,29 +23,20 @@
 
 ---
 
-## 🎯 O Que é Este Projeto?
+## Sobre
 
-O **DR Custom Terminal** é um toolkit modular completo para personalizar seu terminal macOS. Ele instala e configura automaticamente:
+O **DR Custom Terminal** é um toolkit modular completo para personalizar seu terminal macOS. Ele instala e configura automaticamente um conjunto de ferramentas e configurações que transformam o terminal padrão em um ambiente de desenvolvimento produtivo com shell moderno, temas de prompt, fontes com ícones e utilitários CLI de alto desempenho.
+
+O instalador gerencia os seguintes componentes:
 
 - **Shell Framework** - Oh My ZSH com plugins poderosos
-- **Fontes com Ícones** - Nerd Fonts para visual rico
+- **Fontes com Ícones** - Nerd Fonts para suporte a caracteres especiais
 - **Temas de Prompt** - Powerlevel10k ou Starship
-- **Ferramentas CLI Modernas** - Substitutos superiores para comandos clássicos
-
-### Por que usar?
-
-| Problema | Solução |
-|----------|---------|
-| Terminal feio e sem cor | Temas bonitos + sintaxe colorida |
-| `ls` básico sem informações | `eza` com ícones, cores e status Git |
-| `cat` sem destaque de código | `bat` com syntax highlighting |
-| Buscar arquivos é lento | `fd` + `fzf` = busca instantânea |
-| Histórico difícil de navegar | Busca fuzzy com `CTRL-R` |
-| Git na linha de comando é tedioso | `lazygit` com interface visual |
+- **Ferramentas CLI Modernas** - Substitutos de alto desempenho para comandos clássicos do Unix
 
 ---
 
-## 🚀 Início Rápido
+## Início Rápido
 
 ```bash
 git clone https://github.com/yourusername/terminal-customization.git && cd terminal-customization && ./install.sh
@@ -53,7 +44,7 @@ git clone https://github.com/yourusername/terminal-customization.git && cd termi
 
 ---
 
-## 📦 O que será instalado
+## O que será instalado
 
 O instalador configura automaticamente todos os componentes abaixo:
 
@@ -65,23 +56,24 @@ Base Components          Shell e Prompt            Plugins ZSH
                                                     history-search
 
 CLI Utilities
-  fzf        Busca fuzzy          bat     cat melhor
-  eza        ls moderno           ripgrep grep rápido
-  fd         find simples         zoxide  cd esperto
-  delta      diff bonito          lazygit Git visual
+  fzf        Fuzzy finder             bat        Syntax highlighting
+  eza        Modern ls                ripgrep    Fast search
+  fd         File finder              zoxide     Smart navigation
+  delta      Diff viewer              lazygit    Git TUI
 ```
 
 ---
 
-## 🛠️ Ferramentas Incluídas
+## Ferramentas Incluídas
 
-### 📝 Shell e Prompt
+### Shell e Prompt
 
 <table>
 <tr>
 <td width="50%">
 
 #### Oh My ZSH
+
 Framework de configuração para ZSH com 300+ plugins e temas.
 
 **O que faz:**
@@ -102,6 +94,7 @@ omz update
 <td width="50%">
 
 #### Powerlevel10k
+
 Tema de prompt extremamente rápido e customizável.
 
 **O que faz:**
@@ -124,14 +117,15 @@ nano ~/.p10k.zsh
 
 ---
 
-### 🔍 Busca e Navegação
+### Busca e Navegação
 
 <table>
 <tr>
 <td width="50%">
 
-#### fzf - Fuzzy Finder
-Busca interativa para qualquer coisa.
+#### fzf
+
+Busca interativa para arquivos, histórico de comandos e listas.
 
 **O que faz:**
 - Busca arquivos instantaneamente
@@ -160,8 +154,9 @@ fzf --preview 'bat {}'
 </td>
 <td width="50%">
 
-#### zoxide - CD Inteligente
-Navegação de diretórios que aprende seus hábitos.
+#### zoxide
+
+Navegação de diretórios inteligente que aprende seus hábitos de uso.
 
 **O que faz:**
 - Lembra diretórios visitados
@@ -183,22 +178,21 @@ zi
 zoxide query -l
 ```
 
-**Dica:** Após usar, `z` sabe onde você quer ir!
-
 </td>
 </tr>
 </table>
 
 ---
 
-### 📂 Visualização de Arquivos
+### Visualização de Arquivos
 
 <table>
 <tr>
 <td width="50%">
 
-#### bat - Cat com Superpoderes
-Visualizador de arquivos com syntax highlighting.
+#### bat
+
+Visualizador de arquivos com syntax highlighting automático.
 
 **O que faz:**
 - Destaque de sintaxe automático
@@ -227,8 +221,9 @@ bat --list-themes
 </td>
 <td width="50%">
 
-#### eza - LS Moderno
-Substituto do `ls` com cores, ícones e mais.
+#### eza
+
+Substituto moderno do `ls` com cores, ícones e informações Git.
 
 **O que faz:**
 - Ícones para tipos de arquivo
@@ -267,14 +262,15 @@ lt    # eza --tree
 
 ---
 
-### 🔎 Busca em Arquivos
+### Busca em Arquivos
 
 <table>
 <tr>
 <td width="50%">
 
-#### ripgrep (rg) - Grep Ultra-rápido
-Busca em arquivos 10x mais rápida que grep.
+#### ripgrep
+
+Busca recursiva em arquivos com suporte a regex e performance otimizada.
 
 **O que faz:**
 - Busca recursiva por padrão
@@ -309,8 +305,9 @@ rg -l "useState"
 </td>
 <td width="50%">
 
-#### fd - Find Simplificado
-Alternativa ao `find` com sintaxe amigável.
+#### fd
+
+Alternativa simplificada ao comando `find` com sintaxe intuitiva.
 
 **O que faz:**
 - Sintaxe simples e intuitiva
@@ -348,20 +345,21 @@ fd -E node_modules "config"
 
 ---
 
-### 🔀 Git Avançado
+### Git Avançado
 
 <table>
 <tr>
 <td width="50%">
 
-#### delta - Diff Bonito
-Diffs do Git com syntax highlighting.
+#### delta
+
+Visualizador de diffs do Git com syntax highlighting por linguagem.
 
 **O que faz:**
 - Cores por linguagem
 - Números de linha
 - Navegação lado a lado
-- Integração com Git
+- Integração automática com Git
 
 **Já configurado automaticamente!**
 
@@ -384,15 +382,16 @@ git diff main..feature
 </td>
 <td width="50%">
 
-#### lazygit - Git Visual
-Interface TUI completa para Git.
+#### lazygit
+
+Interface TUI (Text User Interface) completa para operações Git.
 
 **O que faz:**
 - Stage/unstage visual
 - Commits interativos
 - Navegação de branches
 - Resolução de conflitos
-- Cherry-pick, rebase, etc.
+- Cherry-pick, rebase, merge
 
 **Como usar:**
 ```bash
@@ -417,14 +416,15 @@ lazygit
 
 ---
 
-### 📊 Sistema e Monitoramento
+### Sistema e Monitoramento
 
 <table>
 <tr>
 <td width="50%">
 
-#### btop - Monitor de Recursos
-Monitor de sistema com interface gráfica no terminal.
+#### btop
+
+Monitor de recursos do sistema com interface gráfica no terminal.
 
 **O que faz:**
 - CPU, RAM, Disco, Rede
@@ -449,8 +449,9 @@ btop
 </td>
 <td width="50%">
 
-#### neofetch - Info do Sistema
-Exibe informações do sistema com estilo.
+#### neofetch
+
+Exibe informações do sistema com formatação visual.
 
 **O que faz:**
 - Logo do macOS em ASCII
@@ -467,10 +468,7 @@ neofetch
 neofetch --ascii_distro mac_small
 ```
 
-**Dica:** Adicione ao `.zshrc` para ver ao abrir terminal:
-```bash
-echo "neofetch" >> ~/.zshrc
-```
+Para adicionar ao startup do terminal, veja a seção de pós-instalação.
 
 </td>
 </tr>
@@ -478,7 +476,7 @@ echo "neofetch" >> ~/.zshrc
 
 ---
 
-### ⚡ Plugins ZSH
+### Plugins ZSH
 
 | Plugin | O que faz | Como funciona |
 |--------|-----------|---------------|
@@ -489,7 +487,7 @@ echo "neofetch" >> ~/.zshrc
 
 ---
 
-## 🎨 Temas de Cores
+## Temas de Cores
 
 Instale temas de cores para seu terminal:
 
@@ -509,14 +507,12 @@ Instale temas de cores para seu terminal:
 
 ---
 
-## 🔧 Gerenciamento de Módulos
+## Gerenciamento de Módulos
 
 Cada módulo pode ser gerenciado individualmente:
 
 ```bash
-# ┌─────────────────────────────────────────────────┐
-# │ Comandos disponíveis para cada módulo           │
-# └─────────────────────────────────────────────────┘
+# Comandos disponíveis para cada módulo
 
 # Instalar
 ./modules/utils/fzf.sh install
@@ -552,62 +548,64 @@ modules/
 │   └── zsh-history-substring-search.sh
 └── utils/
     ├── fzf.sh            # Fuzzy finder
-    ├── bat.sh            # Cat melhorado
-    ├── eza.sh            # Ls moderno
-    ├── ripgrep.sh        # Grep rápido
-    ├── fd.sh             # Find simples
-    ├── zoxide.sh         # Cd inteligente
-    ├── delta.sh          # Diff bonito
-    ├── lazygit.sh        # Git visual
-    ├── btop.sh           # Monitor sistema
-    └── neofetch.sh       # Info sistema
+    ├── bat.sh            # Syntax highlighting
+    ├── eza.sh            # Modern ls
+    ├── ripgrep.sh        # Fast search
+    ├── fd.sh             # File finder
+    ├── zoxide.sh         # Smart navigation
+    ├── delta.sh          # Diff viewer
+    ├── lazygit.sh        # Git TUI
+    ├── btop.sh           # System monitor
+    └── neofetch.sh       # System info
 ```
 
 ---
 
-## 📁 Estrutura do Projeto
+## Estrutura do Projeto
 
 ```
 terminal-customization/
 │
-├── install.sh              # 🚀 Instalador principal
-├── custom-startup.sh       # ⚙️  Configurações de startup
+├── install.sh              # Instalador principal
+├── custom-startup.sh       # Configurações de startup
 │
-├── core/                   # 🔧 Bibliotecas core
-│   ├── colors.sh           #    Definições de cores ANSI
-│   ├── ui.sh               #    Componentes de UI (headers, spinners)
-│   ├── validators.sh       #    Funções de validação
-│   ├── shell-config.sh     #    Helpers de configuração shell
-│   └── installers.sh       #    Wrappers de instalação
+├── core/                   # Bibliotecas core
+│   ├── colors.sh           # Definições de cores ANSI
+│   ├── ui.sh               # Componentes de UI
+│   ├── validators.sh       # Funções de validação
+│   ├── shell-config.sh     # Helpers de configuração shell
+│   └── installers.sh       # Wrappers de instalação
 │
-├── modules/                # 📦 Módulos de instalação
-│   ├── base/               #    Componentes base
-│   ├── shell/              #    Frameworks de shell
-│   ├── fonts/              #    Fontes
-│   ├── prompt/             #    Temas de prompt
-│   ├── plugins/            #    Plugins ZSH
-│   └── utils/              #    Utilitários CLI
+├── modules/                # Módulos de instalação
+│   ├── base/               # Componentes base
+│   ├── shell/              # Frameworks de shell
+│   ├── fonts/              # Fontes
+│   ├── prompt/             # Temas de prompt
+│   ├── plugins/            # Plugins ZSH
+│   └── utils/              # Utilitários CLI
 │
-├── themes/                 # 🎨 Customização visual
-│   ├── ascii-art/          #    Arte ASCII
-│   └── color-schemes/      #    Esquemas de cores
+├── themes/                 # Customização visual
+│   ├── ascii-art/          # Arte ASCII
+│   └── color-schemes/      # Esquemas de cores
 │
-└── docs/                   # 📚 Documentação
-    ├── MODULES.md          #    Documentação detalhada
-    └── TROUBLESHOOTING.md  #    Solução de problemas
+└── docs/                   # Documentação
+    ├── MODULES.md          # Documentação detalhada
+    └── TROUBLESHOOTING.md  # Solução de problemas
 ```
 
 ---
 
-## ⚙️ Pós-Instalação
+## Pós-Instalação
 
 ### 1. Reinicie o Terminal
+
 ```bash
 source ~/.zshrc
 # ou simplesmente feche e abra novamente
 ```
 
 ### 2. Configure o Powerlevel10k
+
 ```bash
 p10k configure
 ```
@@ -631,9 +629,17 @@ p10k configure
 }
 ```
 
+### 4. (Opcional) Adicionar neofetch ao Startup
+
+Para exibir informações do sistema ao abrir o terminal:
+
+```bash
+echo "neofetch" >> ~/.zshrc
+```
+
 ---
 
-## 📋 Requisitos
+## Requisitos
 
 | Requisito | Mínimo |
 |-----------|--------|
@@ -644,38 +650,12 @@ p10k configure
 
 ---
 
-## 🐛 Solução de Problemas
-
-### Ícones não aparecem
-→ Configure a fonte **MesloLGS NF** no seu terminal
-
-### Cores estranhas
-→ Verifique se o terminal suporta 256 cores:
-```bash
-echo $TERM  # Deve mostrar xterm-256color
-```
-
-### Comando não encontrado
-→ Recarregue o shell:
-```bash
-source ~/.zshrc
-```
-
-### Ver log de instalação
-```bash
-cat .install.log
-```
-
-Para mais problemas, veja [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md).
-
----
-
-## 📄 Licença
+## Licença
 
 MIT License - veja o arquivo [LICENSE](LICENSE) para detalhes.
 
 ---
 
 <p align="center">
-  <a href="#-terminal-customization-gallery">⬆️ Voltar ao topo</a>
+  <a href="#-dr-custom-terminal">⬆️ Voltar ao topo</a>
 </p>
